@@ -1,0 +1,6 @@
+[submodule "S3DGLPy"]
+	path = S3DGLPy
+	url = https://github.com/ctralie/S3DGLPy.git
+[submodule "GLEAT"]
+	path = GLEAT
+	url = https://github.com/ctralie/GLEAT.git
