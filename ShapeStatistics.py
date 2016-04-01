@@ -1,3 +1,6 @@
+#Purpose: To implement a suite of 3D shape statistics and to use them for point
+#cloud classification
+#TODO: Fill in all of this code for group assignment 2
 import sys
 sys.path.append("S3DGLPy")
 from Primitives3D import *
@@ -286,7 +289,7 @@ if __name__ == '__main__':
             m.loadOffFileExternal(filename)
             (Ps, Ns) = samplePointCloud(m, NRandSamples)
             PointClouds.append(Ps)
-            Normals.append(Ps)
+            Normals.append(Ns)
     
     #TODO: Finish this, run experiments.  Also in the above code, you might
     #just want to load one point cloud and test your histograms on that first
