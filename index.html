@@ -1,0 +1,504 @@
+<!-- Start of Header Code -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<link rel="stylesheet" type="text/css" href="../../main.css" />
+<link rel="icon" href="../../../favicon.ico" type="image/x-icon"/>
+<link rel="shortcut icon" href="../../../favicon.ico" type="image/x-icon"/>
+<!--LaTeX in Javascript!-->
+<script src="../../../../jsMath/easy/load.js"></script>
+<!--Syntax highlighting in Javascript!-->
+<script type="text/javascript" src="../../../../syntaxhighlighter/scripts/shCore.js"></script>
+<script type="text/javascript" src="../../../syntaxhighlighter/scripts/shBrushJScript.js"></script>
+<script type="text/javascript" src="../../../../syntaxhighlighter/scripts/shBrushCpp.js"></script>
+<script type="text/javascript" src="../../../../syntaxhighlighter/scripts/shBrushMatlabSimple.js"></script>
+<script type="text/javascript" src="../../../../syntaxhighlighter/scripts/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../../../../syntaxhighlighter/styles/shCoreDefault.css"/>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+<title>COMPSCI/MATH 290: Digital 3D Geometry Spring 2016</title>
+</head>
+<body>
+<div id="wrapper">
+
+<div id="menu-bar">
+<center><h1>COMPSCI/MATH 290: Spring 2016</h1></center>
+<ul class="menus-level0">
+<li><a href="../../index.html">General</a></li>
+<li><a href = "../../syllabus.html">Syllabus</a></li>
+<li><a href = "../../assignments.html">Assignments</a></li>
+<li><a href = "../../finalproject.html">Final Project</a></li>
+<li><a href = "../../raffle.html">Raffle</a></li>
+</ul>
+</div>
+<!-- End of Header Code -->
+
+<div id="page-content">
+<h1>Group Assignment 2: Shape Google (100 Points)</h1>
+<h2>By <a href = "http://www.ctralie.com">Chris Tralie</a></h2>
+
+<h2><a href = "ClassificationContest">Click here</a> to see the classification contest results!</h2>
+
+<ul>
+<li><a href = "#overview">Overview</a>
+</li>
+<li><a href = "#code">Codebase / Shape Database</a>
+<ul>
+<li><a href = "#codelayout">Code Layout</a></li>
+<li><a href = "#database">Shape Database / Point Cloud Viewer</a></li>
+<li><a href = "#spheresampling">Uniform Sphere Sampling</a></li>
+</ul>
+</li>
+
+<li><a href = "#features">Features</a>
+<ul>
+<li><a href = "#normalize"><font color = "#0000bb">Mean-Center / RMS Normalize Point Clouds (6 Points)</font></a></li>
+<li><a href = "#histograms"><font color = "#0000bb">Shell Histograms (6 Points)</font></a></li>
+<li><a href = "#sectors">Shell Histograms + Sorted Sectors (10 Points)</a></li>
+<li><a href = "#histpca">Shell Histograms + PCA Eigenvalues (8 Points)</a></li>
+<li><a href = "#d2"><font color = "#0000bb">D2 Distance Histogram (10 Points)</font></a></li>
+<li><a href = "#a3">A3 Angle Histogram (10 Points)</a></li>
+<!--<li><a href = "#d3">D3 Area Histogram (10 Points)</a></li>-->
+<li><a href = "#egi">Extended Gaussian Image (10 Points)</a></li>
+<li><a href = "#spin">Spin Images (20 Points)</a></li>
+<li><a href = "#sphereharmon">Spherical Harmonic Magnitudes (25 Points)</a></li>
+</ul>
+</li>
+<li><a href = "#comparison">Histogram Comparison</a>
+<ul>
+<li><a href = "#euclidean"><font color = "#0000bb">Euclidean Distance (5 Points)</font></a></li>
+<li><a href = "#cosine">Cosine Distance (5 Points)</a></li>
+<li><a href = "#chisquared">Chi Squared Distance (5 Points)</a>
+<li><a href = "#earthmovers">1D Earth Mover's Distance (10 Points)</a></li>
+</ul>
+</li>
+</li>
+<li><a href = "#evaluation">Performance Evaluation</a>
+<ul>
+<li><a href = "#precisionrecall"><font color = "#0000bb">Precision Recall Graphs / Experiments (25 Points)</font></a></li>
+</ul>
+</li>
+<li><a href = "#contest">Classification Contest</a>
+<ul>
+<li><a href = "#submission">Classification Contest Submission (5 -20 Points)</li>
+</ul>
+</ul>
+
+<h2><a name = "overview">Overview</a></h2>
+
+<p>
+Now that you have had some practice with Numpy in the <a href = "../Mini3_ICP">ICP alignment assignment</a>, it is time to apply those skills to another statistical task of automatically classifying shapes.  Groups will implement a variety of shape descriptor histograms that are applied to a database of point clouds, and they will test the ability of these shape descriptors to group similar shapes together and to separate shapes that are different.
+</p>
+
+<p>
+This assignment will be due on <b>Wednesday 3/30 at 11:55PM</b>.  As before, groups of 2 have to earn 100 points, and groups of 3 have to earn 120 points.  <b>There will be no extra credit on this assignment</b>; scores will be capped at 100% this time (unless you win the <a href = "#contest">classification contest</a>).  And as before, the tasks <font color = "#0000bb">marked in blue</font>.  This time, points will be deducted from 100 for any mistakes on the bold tasks, regardless of the amount of extra tasks you have done, so be sure to treat them carefully.  Otherwise, the grading will not be as strict as it was on <a href = "../Mini3_ICP">Mini Assignment 3</a>, but you should use numpy multiplications, broadcasting, and selection wherever you can to keep things running quickly.
+</p>
+
+<p>
+Also, student answers on Piazza are strongly encouraged, and more raffle points will be given out during this assignment to promote students who help each other.
+</p>
+
+<ul>
+<li>This assignment was inspired by Princeton COS 429 Fall 2009, Computer Vision, <a href = "http://www.cs.princeton.edu/courses/archive/fall09/cos429/assignment3.html">Assignment 3</a>.</li>
+</ul>
+
+
+<h2><a name = "code">Codebase / Shape Database</a></h2>
+<h3><a name = "codelayout">Code Layout</a></h3>
+
+<h4><a href = "Group2_ShapeGoogle.zip">Click here</a> to download all of the code and the mesh database for this assignment</h4>
+
+For all of the tasks in this assignment, you will be editing a python file called <code>ShapeStatistics.py</code>.  As long as you installed the scipy stack in <a href = "../Mini3_ICP">Mini Assignment 3</a>, you should be good to go software wise.  Make sure you are able to use <a href = "http://matplotlib.org/examples/pylab_examples/simple_plot.html">Matplotlib</a>, though, as you will need that in the <a href = "#evaluation">performance evaluation</a>.
+
+<h3><a name = "database">Shape Database / Point Cloud Viewer</a></h3>
+The shape database on which you will be testing classification techniques consists of a set of 200 shapes in 20 different classes, 10 for each class.  The meshes can be found in the directory <code>models_off</code>.  The main method in <code>ShapeStatistics.py</code> is setup to load all meshes, but you should start out making sure your descriptors work on one mesh at a time.<BR><BR>
+
+For your information, you can also view the result of sampling the meshes in a point cloud viewer generated for this assignment.  For example, if you run the code
+
+<script type="syntaxhighlighter" class="brush: python"><![CDATA[
+    m = PolyMesh()
+    m.loadFile("models_off/biplane0.off") #Load a mesh
+    (Ps, Ns) = samplePointCloud(m, 20000) #Sample 20,000 points and associated normals
+    exportPointCloud(Ps, Ns, "biplane.pts") #Export point cloud
+]]></script>
+
+It will generate a file <a href = "biplane.pts">biplane.pts</a> with 20000 points and their estimated normals, and when you load it in <a href = "PCViewer.html">PCViewer.html</a>, you should see something like this:<BR><BR>
+
+<img src = "biplane_pointsnormals.png">
+
+
+<h3><a name = "spheresampling">Uniform Sphere Sampling</a></h3>
+A method called <code>getSphereSamples(res)</code> has been provided that samples points uniformly on the sphere.  This is useful in <a href = "#sectors">shells + sectors</a> and <a href = "#egi">extended Gaussian image</a> descriptors, for example.  The parameter <code>res</code> is used to control the resolution of the sampled sphere, and increasing it by one increases the number of samples roughly by a factor of 4.  
+<BR><BR>
+
+<table>
+<tr><td><h3>res = 2: 66 Points</h3></td>  <td><h3>res = 3: 258 Points</h3></td><td><h3>res = 4: 1026 Points</h3></td></tr>
+
+<tr>
+<td><img src = "Sphere66.png"></td>
+<td><img src = "Sphere258.png"></td>
+<td><img src = "Sphere1026.png"></td>
+
+</table>
+
+<h2><a name = "features">Features</a></h2>
+
+<h3><a name = "normalize"><font color = "#0000bb">Mean-Center / RMS Normalize Point Clouds (6 Points)</font></a></h3>
+
+<ul>
+<li>Fill in the function <code><b>samplePointCloud(mesh, N)</b></code></li>
+</ul>
+
+Before comparing point clouds, we want to make sure they are invariant to rigid 3D transformations.  Translation and scale are easy to deal with, but rotation invariance is harder, and it will be wrapped into the different descriptors that follow.  To account for translation, the first thing you have to do is center each point cloud on its centroid.  Then, to account for scale, apply a uniform scale in all directions to each point so that the root mean square distance of each point to the origin is 1.  That is, for a point cloud <b>X = {x<SUB>i</SUB>}<SUB>i=1:N</SUB></b> with <b>N</b> points, apply a scale <b>s</b> so that
+
+<h3>
+\[ \sqrt{ \frac{1}{N} \sum_{i=1}^N ||sx_i||^2 } = 1 \]
+</h3>
+
+
+
+<h3><a name = "histograms"><font color = "#0000bb">Shell Histograms (6 Points)</font></a></h3>
+<ul>
+<li>Fill in the function <code><b>getShapeHistogram(Ps, NShells, RMax)</b></code></li>
+</ul>
+
+For <b>NShells</b> concentric spherical shells with boundary radii between <b>0</b> and <b>RMax</b>, create a histogram that counts the number of points that fall in each shell.  For instance, if RMax was 2 and NShells was 4, create a histogram bins counting points in the distances ranges [0, 0.5), [0.5, 1), [1, 1.5), [1.5, 2].  See image below for an example bin in the histogram:<BR><BR>
+
+<img src = "ShapeHist.png"><BR><BR>
+
+<div id = "tips">
+Hints:
+<ul>
+<li>The command <code><a href = "http://docs.scipy.org/doc/numpy-1.10.0/reference/generated/numpy.linspace.html">numpy.linspace</a></code> may be helpful to evenly space your bin radii</li>
+</ul>
+</div>
+<BR>
+
+<h3><a name = "sectors">Shell Histograms + Sorted Sectors (10 Points)</a></h3>
+
+<ul>
+<li>Fill in the function <code><b>getShapeShellHistogram(Ps, Ns, NShells, RMax, SPoints)</b></code></li>
+</ul>
+To add some further granularity to the above shape histogram, split each shell up into a number of <i>sectors</i> and bin the points into each sector for each shell.  To keep this rotation invariant, sort the sectors in increasing or decreasing order of the number of points that falls in each sector.  The video below shows an example of sectors in 2D<BR><BR>
+<video controls width = 400 height = 200>
+  <source src='ShapeHistSectors.ogg' type="video/ogg">
+Your browser does not support the video tag.
+</video><BR><BR>
+But you will have to do them in 3D.  There has been a function provided which samples points uniformly on the unit sphere.  Thinking of each point as a direction, take the dot product of every point in the point cloud with each point on the sphere, and bin each point to the sphere direction that has the largest dot product.<BR><BR>
+
+<div id = "tips">
+Hints:
+<ul>
+<li>The command <a href = "http://docs.scipy.org/doc/numpy-1.10.1/reference/generated/numpy.sort.html">numpy.sort</a> may come in handy here</li>
+<li>In numpy, you can select a subset of an array that satisfies a boolean condition.  For instance
+
+<script type="syntaxhighlighter" class="brush: python"><![CDATA[
+X = np.random.randn(2, 100) #Create 100 random points in 2D
+XSub = X[:, X[0, :] > 0] #Select all points with first coordinate greater than zero
+]]></script>
+
+This might be useful for selecting points in shells before you bin them to different directions of the sphere
+
+</li>
+
+
+</ul>
+</div>
+
+<BR>
+
+<h3><a name = "histpca">Shell Histograms + PCA Eigenvalues (8 Points)</a></h3>
+
+<ul>
+<li>Fill in the function <code><b>getShapeHistogramPCA(Ps, Ns, NShells, RMax)</b></code></li>
+</ul>
+
+Instead of simply counting the points in each shell, compute PCA of the points in each shell and report the eigenvalues sorted from largest to smallest (or smallest to largest, as long as you're consistent).  As such, this histogram will be 3x as long as the basic shape histogram (which is still much shorter than the shells + sectors).  <b><u>Do not</u> scale the eigenvalues down by the number of points like we did in the <a href = "https://github.com/COMPSCI290-S2016/NumpyDemos/blob/master/pcademo.py">class example</a>.  We want to retain information about the number of points, as well as how <a href = "https://en.wikipedia.org/wiki/Isotropy">isotropic</a> they are</b>
+
+<BR><BR>
+<div id = "tips">
+Hints:
+<ul>
+<li>It might be useful to fill in the helper function <b><code>doPCA(X)</code></b>.
+</ul>
+</div>
+<BR>
+
+<h3><a name = "d2"><font color = "#0000bb">D2 Distance Histogram (10 Points)</font></a></h3>
+
+<ul>
+<li>Fill in the function <code><b>getD2Histogram(Ps, Ns, DMax, NBins, NSamples)</b></code></li>
+</ul>
+
+Compute a histogram of the Euclidean distances between randomly sampled points in the point cloud.  You should play around with the number of points sampled and see how it impacts classification performance (there is a tradeoff between computation time and performance...taking all pairs may be expensive).<BR><BR>
+
+<img src = "D2.png"><BR>
+<h4>(courtsey of <a href = "http://web.eecs.umich.edu/~silvio/teaching/EECS598/papers/p807-osada.pdf">Osada2002</a>)</h4>
+
+<div id = "tips">
+Hints:
+<ul>
+<li>The command <a href = "http://docs.scipy.org/doc/numpy-1.10.0/reference/generated/numpy.random.random_integers.html">numpy.random.random_integers</a> might help you with randomly sampling</li>
+<li>The command <a href = "http://docs.scipy.org/doc/numpy-1.10.1/reference/generated/numpy.histogram.html">numpy.histogram</a> may come in handy here</li>
+</ul>
+</div>
+
+<h3><a name = "a3">A3 Angle Histogram (10 Points)</a></h3>
+<ul>
+<li>Fill in the function <code><b>getA3Histogram(Ps, Ns, NBins, NSamples)</b></code></li>
+</ul>
+
+Make a histogram of angles that you get when sampling random triples of points, as shown in the image below (courtsey of <a href = "http://web.eecs.umich.edu/~silvio/teaching/EECS598/papers/p807-osada.pdf">Osada2002</a>)<BR><BR>
+
+<img src = "A3.png"><BR><BR>
+
+Angles should be distributed between 0 and PI.
+
+<div id = "tips">
+Hints:
+<ul>
+<li>Use the command <a href = "http://docs.scipy.org/doc/numpy-1.10.1/reference/generated/numpy.arccos.html">numpy.arccos</a> after computing a <b>normalized</b> dot product</li>
+</ul>
+</div>
+
+<h3><a name = "egi">Extended Gaussian Image (10 Points)</a></h3>
+
+<ul>
+<li>Fill in the function <code><b>getEGIHistogram(Ps, Ns, NShells, SPoints)</b></code></li>
+</ul>
+
+First, project the normals onto the PCA axes of the point cloud to attempt to factor out rotation of the normals.  Then, bin all of the normals to the sphere.  The solution to this problem should look similar to the solution you had for the shells + sectors if you did that, except there's only one shell (since we're thinking just about the normals, which don't have a notion of distance from the origin).
+
+<h3><a name = "spin">Spin Images (20 Points)</a></h3>
+<ul>
+<li>Fill in the function <code><b>getSpinImage(Ps, Ns, NAngles, Extent, Dim)</b></code></li>
+</ul>
+
+
+First, align the point cloud with its PCA axes, as in the Extended Gaussian Image.  Then, rotate the point cloud around its axis of greatest variation and bin the point cloud projected onto the other two axes.  Let's look at one of the biplanes for an example:<BR><BR>
+
+<img src = "biplane0PC.png"><BR><BR>
+
+Since the wings are quite wide and hold a lot of points, the direction of greatest variance is along the wings, so that's the axis around which we will be rotating.  The point of rotation at the centroid is also around the wings.  The image below shows an example state of the projected points as they are spinning, and their corresponding histogram image binning:<BR><BR>
+
+<img src = "SpinImageFrame.png"><BR><BR>
+
+And here is the final spin image after rotating that around 360 degrees and summing all such images:<BR><BR>
+
+<img src = "SpinImage.png"><BR><BR>
+
+<div id = "tips">
+Hints:
+<ul>
+<li>The command <a href = "http://docs.scipy.org/doc/numpy-1.10.1/reference/generated/numpy.histogram2d.html">numpy.histogram2d</a> should come in handy here</li>
+<li><b>Make sure you're rotating around the direction of greatest variation</b>.  <code><a href = "http://docs.scipy.org/doc/numpy-1.10.1/reference/generated/numpy.linalg.eigh.html">numpy.linalg.eigh</a></code> returns the smallest eigenvalues first, but you want the largest one first.</li>
+</ul>
+</div>
+
+<h3><a name = "sphereharmon">Spherical Harmonic Magnitudes (25 Points)</a></h3>
+
+<ul>
+<li>Fill in the function <code><b>getSphericalHarmonicMagnitudes(Ps, Ns, VoxelRes, Extent, NHarmonics, NSpheres)</b></code></li>
+</ul>
+
+Implement the technique described on page 7 of <a href = "http://dpd.cs.princeton.edu/Papers/FunkShapeTog.pdf">this paper</a>.  That is, rasterize your point cloud to a voxel grid, and compute spherical harmonic <b>magnitudes</b> in concentric spheres around the origin.  <a href = "http://scipython.com/book/chapter-8-scipy/examples/visualizing-the-spherical-harmonics/">Click here</a> to see how to compute spherical harmonics in Python Note that the function <code>scipy.special.sph_harm</code> returns complex numbers, and you will need to take their magnitude to make this descriptor rotation invariant, as explained in class.
+
+<div id = "tips">
+Hints:
+<ul>
+<li>The function <a href = "http://docs.scipy.org/doc/numpy-1.10.0/reference/generated/numpy.histogramdd.html">numpy.histogramdd</a> may come in handy here for creating a voxel grid of your point cloud, but note that you actually want a binary image, so all you care about is whether a voxel is occupied by at least one point or not</li>
+</ul>
+</div>
+
+<!--Some symmetry descriptor?-->
+
+<h2><a name = "comparison">Histogram Comparison</a></h2>
+For full credit, if you implement one of the alternative metrics beyond Euclidean distance, you should submit an average <a href = "#precisionrecall">precision recall graph</a> showing the difference in performance of all of the distance metrics you implemented on at least two of the above features: one plot for feature.  For instance, you could show a precision recall graph for D2 histograms with all of your distance metrics, and you could show one for spin images with all of your histograms.  Note that 1D Earth mover's is only expected to work well for the 1D histograms (basic shells, D2, A3).<BR><BR>
+
+<b>Be sure to normalize each histogram <b>h</b> so that</b>
+<h3>
+\[ \sum_{i=1}^K h[k] = 1 \]
+</h3>
+
+where <b>K</b> is the number of bins in the histogram
+
+
+<h3><a name = "euclidean"><font color = "#0000bb">Euclidean Distance (5 Points)</font></a></h3>
+<ul>
+<li>Fill in the function <code><b>compareHistsEuclidean(AllHists)</b></code></li>
+</ul>
+
+Compute the Euclidean distance between all pairs of histograms for the features computed above, and return all pairwise distances in an <b>N x N</b> matrix <b>D</b>, where <b>N</b> is the number of points clouds.  That is, 
+
+<h3>
+\[ D_{ij} = ||\vec{x_i} - \vec{x_j}|| \]
+</h3>
+
+<div id = "tips">
+Hints:
+<ul>
+<li>You can use a trick very similar to the broadcasting trick you played on mini assignment 3 for the <a href = "../Mini3_ICP/index.html#nn">brute force nearest neighbor correspondences</a></li>
+</ul>
+</div>
+
+<h3><a name = "cosine">Cosine Distance (5 Points)</a></h3>
+
+<ul>
+<li>Fill in the function <code><b>compareHistsCosine(AllHists)</b></code></li>
+</ul>
+
+Compute the Cosine distance between all pairs of histograms after normalization, and return all pairwise distances in an <b>N x N</b> matrix <b>D</b>, where <b>N</b> is the number of points clouds.  That is,
+
+<h3>
+\[ D_{ij} = \frac{ \vec{v_i} \cdot \vec{v_j}}{||\vec{v_i}|| ||\vec{v_j}||} \]
+</h3>
+
+<h3><a name = "chisquared">Chi Squared Distance (5 Points)</a></h3>
+
+<ul>
+<li>Fill in the function <code><b>compareHistsChiSquared(AllHists)</b></code></li>
+</ul>
+
+Compute the Chi Squared distance between all pairs of histograms after normalization, and store them in a matrix <b>D</b>, so that 
+
+<h3>
+\[ D_{ij} = \frac{1}{2} \sum_{k = 1}^K  \frac{ (h_1[k] - h_2[k])^2}{ h_1[k] + h_2[k] }\]
+</h3>
+
+
+
+<h3><a name = "earthmovers">1D Earth Mover's Distance (10 Points)</a></h3>
+<ul>
+<li>Fill in the function <code><b>compareHistsEMD1D(AllHists)</b></code></li>
+</ul>
+
+Compute the 1D <a href = "https://en.wikipedia.org/wiki/Earth_mover's_distance">Earth Mover's Distance</a> between all pairs of histograms after normalization.  There is a simple closed form formula for the Earth Mover's distance for 1D histograms.  For a histogram <b>h</b>, define the <a href = "https://en.wikipedia.org/wiki/Cumulative_distribution_function">CDF</a> <b>h<SUP>C</SUP></b> as
+
+<h3>
+\[ h^C[k] = \sum_{i = 0}^k h[i] \]
+</h3>
+
+Then the Earth Mover's Distance between two histograms <b>h<SUB>1</SUB></b> and <b>h<SUB>2</SUB></b>
+
+<h3>
+\[ D_{ij} = \sum_{k = 1}^K |h^C_i[k] - h^C_j[k]|  \]
+</h3>
+
+Note that this only makes sense for 1D histograms, so it wouldn't work for Shells + Sectors, EGI, Spin Images, or Spherical Harmonics (you would have to do something fancier by <a href = "https://en.wikipedia.org/wiki/Earth_mover's_distance#Theory">defining distances in a linear program</a>).  But 1D earth mover's should at least theoretically be better than Euclidean for things like D2, A3, and ordinary shape histograms. 
+
+<h2><a name = "evaluation">Performance Evaluation</a></h2>
+<h3><a name = "precisionrecall"><font color = "#0000bb">Precision Recall Graphs / Experiments (25 Points)</font></a></h3>
+
+<ul>
+<li>Fill in the function <code><b>getPrecisionRecall(D, NPerClass = 10)</b></code></li>
+</ul>
+In this section you will evaluate the performance of the different algorithms you implemented by running a series of experiments.  Given histogram similarity scores in the form of an <b>N x N</b> similarity matrix <b>D</b> (as computed by one of the techniques above), compute a <i>precision recall graph</i> for each shape in the database to quantify the performance of different statistics and histogram comparison techniques, as discussed in class.  The algorithm for doing this is as follows
+
+<ol>
+<li>For each shape <b>i</b> look at the <b>i<SUP>th</SUP></b> row of <b>D</b> to get all similarity scores to all other shapes in the database, and sort the entries in increasing order (the command <a href = "http://docs.scipy.org/doc/numpy-1.10.0/reference/generated/numpy.argsort.html">numpy.argsort</a> may come in handy here).<BR>
+<b>NOTE: For cosine distance you will have to sort (1-cosine distance), since cosine distance is 1 for most similar and -1 for least similar, and you want similar shapes to come first in the sorted list</b>
+</li>
+<li>
+Now walk through every entry in the sorted row.  Every time you encounter another shape that's in the same class, make an entry for the next recall value, and record the precision, which is the fraction of shapes in the correct class over the fraction of shapes you've looked at so far.  For instance, if the third shape in a group of 9 that you're looking for is at position 5 in the sorted list (excluding the query shape), your recall will be 3/9, and your precision will be 3/5
+
+<BR>
+<i>Be sure not to include the query shape itself in the calculation.  You're only comparing it to the 9 other shapes in its class.</i>
+</li>
+<li>
+Repeat steps 1 and 2 for every shape in the database, and average all of the results together.
+</li>
+</ol>
+<BR><BR>
+
+See Figure 19 of <a href = "http://www.cs.princeton.edu/~funk/tog02.pdf">this paper</a> for an example of precision recall graphs.  Also, below is an example that I generated in this codebase:<BR><BR>
+<img src = "PrecisionRecallExample.png"><BR><BR>
+Don't worry too much if your curves don't look exactly like that.  I just wanted to give a ballpark for how they should look.  They can vary quite a bit depending on the parameters you choose for the number of points to sample, number of distances to sample, number of bins, etc, as well as the method of comparing histograms (I just used straight Euclidean in this example), and you should play around with that in the section.  For your reference, the code I used to generate that plot is as follows:
+
+<script type="syntaxhighlighter" class="brush: python"><![CDATA[
+SPoints = getSphereSamples(2)
+HistsSpin = makeAllHistograms(PointClouds, Normals, getSpinImage, 100, 2, 40)
+HistsEGI = makeAllHistograms(PointClouds, Normals, getEGIHistogram, SPoints)
+HistsA3 = makeAllHistograms(PointClouds, Normals, getA3Histogram, 30, 100000)
+HistsD2 = makeAllHistograms(PointClouds, Normals, getD2Histogram, 3.0, 30, 100000)
+
+DSpin = compareHistsEuclidean(HistsSpin)
+DEGI = compareHistsEuclidean(HistsEGI)
+DA3 = compareHistsEuclidean(HistsA3)
+DD2 = compareHistsEuclidean(HistsD2)
+
+PRSpin = getPrecisionRecall(DSpin)
+PREGI = getPrecisionRecall(DEGI)
+PRA3 = getPrecisionRecall(DA3)
+PRD2 = getPrecisionRecall(DD2)
+
+recalls = np.linspace(1.0/9.0, 1.0, 9)
+plt.plot(recalls, PREGI, 'c', label='EGI')
+plt.hold(True)
+plt.plot(recalls, PRA3, 'k', label='A3')
+plt.plot(recalls, PRD2, 'r', label='D2')
+plt.plot(recalls, PRSpin, 'b', label='Spin')
+plt.xlabel('Recall')
+plt.ylabel('Precision')
+plt.legend()
+plt.show()
+]]></script>
+
+
+<BR><BR><b>To get full credit on this section, you need to run the following experiments and generate precision recall graphs</b>
+
+<ul>
+<li>Create precision recall graphs comparing every descriptor you implemented with reasonable parameter choices for each one.  <i>Also, plot against the case of a set of random histograms for comparison</i>.  With your README file, make some general observations about which ones seem to perform better and why you think that might be the case</li>
+<li>Create precision recall graphs which show the effect of choosing different numbers of bins for the basic shell histogram</li>
+<li>Create precision recall graphs which show the effect of choosing different numbers of random samples for the D2 histogram</li>
+<li>If you've implemented any of the alternative histogram distance metrics, make at least two precision recall graphs using different metrics on the same descriptor and showing the effect (see above in histogram section)</li>
+<li>At least one other precision recall graph (for instance, if you implemented the extended Gaussian Image, how does the number of sphere sampled normal directions affect the results?)
+</ul>
+
+
+
+<h2><a name = "contest">Classification Contest</a></h2>
+<h3><a name = "submission">Classification Contest Submission (5 -20 Points)</a></h3>
+
+<ul>
+<li>Fill in the function <code><b>getMyShapeDistances(PointClouds, Normals)</b></code></li>
+</ul>
+
+
+<p>
+We will be running a point cloud classification competition as part of this assignment.  If you submit an entry, your code will be run on a previously unseen database of shapes, and classification statistics will be computed running your code on this database with a leave-one-out technique averaged over all shapes.  <b>5 points</b> for any submission whatsoever, and the winner gets <b>20 points</b>.  The results will be summarized on the course web page, so please come up with a group name to put next to your algorithm
+</p>
+
+<p>Your job for this classification task is to come up with the best features you can and to use them to compute distances between every pair of point clouds.  Note that there is a lot of work in machine learning on fusing classification algorithms, but your job here is to come up with the best <b>D</b> matrix you can comparing point clouds, and that <b>D</b> matrix will be fed to a fixed classification algorithm.
+</p>
+
+<p>
+When designing a submission, feel free to use any of the histograms and histogram comparison techniques you implemented as part of this assignment, with the best parameters you found.  Or feel free to use some weighted combination of different histograms, or even an entirely new histogram I didn't mention in class (<a href = "http://www.pointclouds.org">http://www.pointclouds.org</a> may give you some inspiration).  If you found that sampling more or fewer than 10,000 points in each point cloud was advantageous, indicate that in your submission, and I will be sure to run your code with that number of random samples.  
+</p>
+
+<h3>Scoring</h3>
+If you happen to win the point cloud classification contest, then 15 points will be added to your <b>final score</b> no matter what (any submission gets 5 points but the winner gets 20 points, so that's a difference of 15).  So let's say you're a group of 3 and you earn 110 points, which gets scaled down to 92/100, but then you win the contest.  Your final score will then be 92 + 15 / 100 = 107 / 100. 
+
+<ul>
+<li>
+This contest was inspired by <a href = "http://www.music-ir.org/mirex/wiki/MIREX_HOME">MIREX</a>, and particularly by the <a href = "http://www.music-ir.org/mirex/wiki/2015:Audio_Cover_Song_Identification">Audio Cover Song Classification</a> task, which I participated in last year with a new music descriptor I made.
+</li>
+</ul>
+</div>
+
+<!-- Start of StatCounter Code -->
+<script type="text/javascript">
+var sc_project=7309088; 
+var sc_invisible=1; 
+var sc_security="f655b56d"; 
+</script>
+<script type="text/javascript"
+src="http://www.statcounter.com/counter/counter.js"></script>
+<noscript><div class="statcounter"><a title="free hit counter"
+href="http://statcounter.com/" target="_blank"><img class="statcounter"
+src="http://c.statcounter.com/7309088/0/f655b56d/1/" alt="free hit
+counter"></a></div></noscript>
+<!-- End of StatCounter Code -->
+
+</body>
+</html>
+
+
+

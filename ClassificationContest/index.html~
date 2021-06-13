@@ -1,0 +1,133 @@
+<!-- Start of Header Code -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<link rel="stylesheet" type="text/css" href="../../../main.css" />
+<link rel="icon" href="../../../../favicon.ico" type="image/x-icon"/>
+<link rel="shortcut icon" href="../../../../favicon.ico" type="image/x-icon"/>
+<!--LaTeX in Javascript!-->
+<script src="../../../../../jsMath/easy/load.js"></script>
+<!--Syntax highlighting in Javascript!-->
+<script type="text/javascript" src="../../../../../syntaxhighlighter/scripts/shCore.js"></script>
+<script type="text/javascript" src="../../../../../syntaxhighlighter/scripts/shBrushJScript.js"></script>
+<script type="text/javascript" src="../../../../../syntaxhighlighter/scripts/shBrushCpp.js"></script>
+<script type="text/javascript" src="../../../../../syntaxhighlighter/scripts/shBrushMatlabSimple.js"></script>
+<script type="text/javascript" src="../../../../../syntaxhighlighter/scripts/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../../../../../syntaxhighlighter/styles/shCoreDefault.css"/>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+<title>COMPSCI/MATH 290: Digital 3D Geometry Spring 2016</title>
+</head>
+<body>
+<div id="wrapper">
+
+<div id="menu-bar">
+<center><h1>COMPSCI/MATH 290: Spring 2016</h1></center>
+<ul class="menus-level0">
+<li><a href="../../../index.html">General</a></li>
+<li><a href = "../../../syllabus.html">Syllabus</a></li>
+<li><a href = "../../../assignments.html">Assignments</a></li>
+<li><a href = "../../../finalproject.html">Final Project</a></li>
+<li><a href = "../../../raffle.html">Raffle</a></li>
+</ul>
+</div>
+<!-- End of Header Code -->
+
+<div id="page-content">
+<h1><a href = "../">Group Assignment 2</a><BR>Shape Google<BR><b>CLASSIFICATION CONTEST RESULTS</b></h1>
+
+
+
+In this assignment, students implemented various statistics for rigid 3D point cloud classification, and they all had the option to enter code into a classification competition on an unknown database.  There were 7 submissions total.  Below are descriptions of each submission, along with the results of the competition<BR><BR>
+
+
+<h2>Database Info</h2>
+<img src = "shapes_lowres.png"><BR><BR>
+The database that was run was the ground truth model database in the <a href = "http://www.itl.nist.gov/iad/vug/sharp/contest/2015/Range/">SHREC 2015 Range Scan</a> classification competition.  This database consists of 60 different classes with 20 models each, for a total of 1200 models.  Note that this database is easier than the range image database, which was the true objective of that competition, but there are still lots of models and a large potential for confusion, and it is markedly harder than the database provided with the assignment.  So it is appropriate for this class competition.
+
+
+<h2>Team Names / Submission Descriptions</h2>
+
+<table cellpadding = 5>
+
+<tr>
+<td><h3>The Avengers</h3></td>
+<td>We made a new descriptor using the equally weighted average of D2 and Spin Image with the best parameter we found, which gives us a much better precision-recall graph than either one.  We used Euclidean distance in our comparisons</td>
+</tr>
+
+<tr>
+<td><h3>Team BeyoNCe</h3></td>
+<td>We ended up using spin images with chi squared distance</td>
+</tr>
+
+<tr>
+<td><h3>Team JustAPair</h3></td>
+<td>Weighted combination of D2 and shape/shell using Euclidean distance</td>
+</tr>
+
+<tr>
+<td><h3>Team Dej</h3></td>
+<td>D2 + 1D Earth Mover's</td>
+</tr>
+
+<tr>
+<td><h3>Team JollyAlmond</h3></td>
+<td>The best working descriptor and histogram metric that we got is ShapeShell (getShapeShellHistogram) NShells = 50, RMax = 3.0, SPoints = getSphereSamples(2), using Chi Squared</td>
+</tr>
+
+<tr>
+<td><h3>Team Manny</h3></td>
+<td>We submitted the D2 Distance with Chi-squared metric to the classification contest, and we found that sampling more than 100,000 points in each point cloud was advantageous</td>
+</tr>
+
+<tr>
+<td><h3>Team LilB</h3></td>
+<td>Weighted combo of D2, A3, and EGI, using Euclidean</td>
+</tr>
+
+</table>
+
+<h2>Experiments / Results</h2>
+The models were randomly shuffled, and each persons' code (including histogram and histogram comparison) was run.  The students' code returned a pairwise distance matrix between every pair of shapes based on their techniques, and that pairwise distance matrix was evaluated based on ground truth labels.
+
+<h3>Precision Recall Graph</h3>
+<img src = "PrecisionRecall.svg" width = 800 height = 660>
+
+
+<h3>Other Statistics</h3>
+
+Best statistics are bolded.  The rank statistics are with respect to items that are in the correct class.  Mean average precision is the area under the average precision recall curve.<BR><BR>
+
+<table border = "1">
+<tr><td><h3>Team Name</h3></td><td><h3>Runtime</h3></td><td><h3>Mean Rank</h3></td><td><h3>Median Rank</h3></td><td><h3><a href = "https://en.wikipedia.org/wiki/Mean_reciprocal_rank">Mean Reciprocal Rank</a></h3>(larger is better)</td><td><h3><a href = "https://en.wikipedia.org/wiki/Information_retrieval#Mean_average_precision">Mean Average Precision</a></h3> (larger is better)</td></tr>
+
+<tr><td><h3>The Avengers</h3></td><td>843 seconds</td><td>264.477</td><td>136</td><td>0.0670282</td><td>0.202242</td></tr>
+<tr><td><h3>Team BeyoNCe</h3></td><td>811 seconds</td><td>260.43</td><td>142</td><td>0.0559362</td><td>0.168597</td></tr>
+<tr><td><h3>Team JustAPair</h3></td><td><b>31 seconds</b></td><td>355.845</td><td>204</td><td>0.0608969</td><td>0.167617</td></tr>
+<tr><td><h3>Team Dej</h3></td><td>118 seconds</td><td>345.137</td><td>253</td><td>0.0342016</td><td>0.0959</td></tr>
+<tr><td><h3>Team JollyAlmond</h3></td><td>46 seconds</td><td><b>232.728</b></td><td><b>108</b></td><td><b>0.0724633</b></td><td>0.234063</td></tr>
+<tr><td><h3>Team Manny</h3></td><td>1101 seconds</td><td>265.571</td><td>143</td><td>0.0604346</td><td>0.184304</td></tr>
+<tr><td><h3>Team LilB</h3></td><td>263 seconds</td><td>261.715</td><td>146</td><td>0.0540708</td><td>0.16529</td></tr>
+</table>
+
+<BR><BR>
+
+<h3>And by all accounts, the winners are <u>Team JollyAlmond</u>!  Congratulations!</h3>.
+
+<!-- Start of StatCounter Code -->
+<script type="text/javascript">
+var sc_project=7309088; 
+var sc_invisible=1; 
+var sc_security="f655b56d"; 
+</script>
+<script type="text/javascript"
+src="http://www.statcounter.com/counter/counter.js"></script>
+<noscript><div class="statcounter"><a title="free hit counter"
+href="http://statcounter.com/" target="_blank"><img class="statcounter"
+src="http://c.statcounter.com/7309088/0/f655b56d/1/" alt="free hit
+counter"></a></div></noscript>
+<!-- End of StatCounter Code -->
+
+</body>
+</html>
+
+
+
